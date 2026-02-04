@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { setUsers } from '../app/appSlice';
+import { setUsers } from '../features/usersSlice';
 import { getUsers } from '../api/users';
 
 type Props = {
@@ -14,7 +14,7 @@ export const UserSelector: React.FC<Props> = ({
   onChange,
 }) => {
   const dispatch = useAppDispatch();
-  const users = useAppSelector(state => state.app.users);
+  const users = useAppSelector(state => state.users);
   const [expanded, setExpanded] = useState(false);
 
   const selectedUserObject = users.find(user => user.id === selectedUser);
@@ -36,7 +36,6 @@ export const UserSelector: React.FC<Props> = ({
 
     document.addEventListener('click', handleDocumentClick);
 
-    // eslint-disable-next-line consistent-return
     return () => {
       document.removeEventListener('click', handleDocumentClick);
     };
@@ -72,8 +71,10 @@ export const UserSelector: React.FC<Props> = ({
             <a
               key={user.id}
               href={`#user-${user.id}`}
-              onClick={() => {
+              onClick={e => {
+                e.preventDefault();
                 onChange(user.id);
+                setExpanded(false);
               }}
               className={classNames('dropdown-item', {
                 'is-active': user.id === selectedUser,

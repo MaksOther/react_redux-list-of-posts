@@ -4,14 +4,15 @@ import { NewCommentForm } from './NewCommentForm';
 import * as commentsApi from '../api/comments';
 import { Post } from '../types/Post';
 import { CommentData } from '../types/Comment';
-import { useAppDispatch, useAppSelector } from '../app/hooks'; // 👈 Імпортуємо хуки
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setComments,
   setCommentsLoading,
   setCommentsError,
   addComment as addCommentAction,
   removeComment as removeCommentAction,
-} from '../app/appSlice';
+} from '../features/commentsSlice';
+import { clearSelectedPost } from '../features/postsSlice';
 
 type Props = {
   post: Post;
@@ -24,7 +25,7 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
     items: comments,
     loaded,
     hasError,
-  } = useAppSelector(state => state.app.comments);
+  } = useAppSelector(state => state.comments);
 
   const [visible, setVisible] = useState(false);
 
@@ -65,12 +66,30 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
       await commentsApi.deleteComment(commentId);
     } catch {
       dispatch(setCommentsError());
+      dispatch(setCommentsLoading());
+
+      commentsApi
+        .getPostComments(post.id)
+        .then(data => {
+          dispatch(setComments(data));
+        })
+        .catch(() => {
+          dispatch(setCommentsError());
+        });
     }
   };
 
   return (
     <div className="content" data-cy="PostDetails">
       <div className="block">
+        <button
+          type="button"
+          data-cy="SidebarCloseButton"
+          className="delete is-small is-pulled-right"
+          aria-label="close"
+          onClick={() => dispatch(clearSelectedPost())}
+        />
+
         <h2 data-cy="PostTitle">{`#${post.id}: ${post.title}`}</h2>
 
         <p data-cy="PostBody">{post.body}</p>

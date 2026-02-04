@@ -19,16 +19,16 @@ import {
   setPostsError,
   setSelectedPost,
   clearSelectedPost,
-} from './app/appSlice';
+} from './features/postsSlice';
 
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  const posts = useAppSelector(state => state.app.posts.items);
-  const loaded = useAppSelector(state => state.app.posts.loaded);
-  const hasError = useAppSelector(state => state.app.posts.hasError);
-  const authorId = useAppSelector(state => state.app.author);
-  const selectedPostId = useAppSelector(state => state.app.selectedPost);
+  const posts = useAppSelector(state => state.posts.items);
+  const loaded = useAppSelector(state => state.posts.loaded);
+  const hasError = useAppSelector(state => state.posts.hasError);
+  const authorId = useAppSelector(state => state.posts.selectedAuthorId);
+  const selectedPostId = useAppSelector(state => state.posts.selectedPostId);
 
   function loadUserPosts(userId: number) {
     dispatch(setPostsLoading());
